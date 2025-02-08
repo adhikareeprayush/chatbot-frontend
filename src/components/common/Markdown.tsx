@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useState, ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -87,15 +87,12 @@ export const Markdown: FC<MarkdownProps> = ({ content, className, isUserMessage 
         [rehypeHighlight, { languages, subset: false }]
       ]}
       components={{
-        pre: ({ className, children, ...props }) => {
+        pre: ({ children, ...props }) => {
           // Extract the code content for the copy button
-          const codeContent = 'textContent' in children
-            ? (children as any).textContent
-            : Array.isArray(children)
-              ? children.map(child => 
-                  'textContent' in child ? child.textContent : ''
-                ).join('')
-              : '';
+          let codeContent = '';
+          if (children && typeof children === 'object' && 'props' in children) {
+            codeContent = children.props?.children || '';
+          }
 
           return (
             <pre
@@ -103,8 +100,7 @@ export const Markdown: FC<MarkdownProps> = ({ content, className, isUserMessage 
                 "p-4 rounded-lg overflow-x-auto my-4 shadow-sm group relative",
                 isUserMessage 
                   ? "bg-sage-800/90 border border-sage-700" 
-                  : "bg-sage-100 border border-sage-200",
-                className
+                  : "bg-sage-100 border border-sage-200"
               )}
               {...props}
             >
@@ -113,11 +109,12 @@ export const Markdown: FC<MarkdownProps> = ({ content, className, isUserMessage 
             </pre>
           );
         },
-        code: ({ inline, className, children, ...props }) => {
+        code: ({ className, children, ...props }) => {
           const match = /language-(\w+)/.exec(className || '');
           const lang = match?.[1] || '';
+          const isInline = !match;
           
-          return !inline && match ? (
+          return !isInline ? (
             <code
               className={twMerge(
                 className,

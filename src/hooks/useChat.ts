@@ -22,7 +22,7 @@ export const useChat = () => {
   const { settings } = useSettings();
   const [state, setState] = useState<ChatState>(initialState);
   const abortControllerRef = useRef<AbortController | null>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const stopGeneration = useCallback(() => {
     if (abortControllerRef.current) {
