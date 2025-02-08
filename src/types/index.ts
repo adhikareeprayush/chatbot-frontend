@@ -3,12 +3,24 @@ export interface Message {
   sender: 'user' | 'bot';
   text: string;
   timestamp: Date;
+  isStreaming?: boolean;
+  seen?: boolean;
+}
+
+export interface Conversation {
+  id: string;
+  title: string;
+  messages: Message[];
 }
 
 export interface ChatState {
   messages: Message[];
   isLoading: boolean;
   error: string | null;
+  isTyping: boolean;
+  conversations: Conversation[];
+  currentConversationId: string | null;
+  suggestedResponses: string[];
 }
 
 export interface ApiResponse {

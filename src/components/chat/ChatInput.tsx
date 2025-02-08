@@ -1,13 +1,14 @@
 import { FC, FormEvent, useState, useRef, useEffect } from 'react';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Square } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => Promise<void>;
+  onStopGeneration: () => void;
   isLoading: boolean;
 }
 
-export const ChatInput: FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
+export const ChatInput: FC<ChatInputProps> = ({ onSendMessage, onStopGeneration, isLoading }) => {
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -60,7 +61,7 @@ export const ChatInput: FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Type your message..."
-        className="w-full resize-none rounded-xl border border-sage-200 px-4 py-3 pr-24 focus:ring-2 focus:ring-sage-500 focus:border-transparent max-h-32 min-h-[52px] bg-white text-sage-800 placeholder-sage-400"
+        className="w-full resize-none rounded-xl border border-sage-200 px-4 py-3 pr-[4.5rem] focus:ring-2 focus:ring-sage-500 focus:border-transparent max-h-32 min-h-[52px] bg-white text-sage-800 placeholder-sage-400"
         disabled={isLoading}
         rows={1}
         autoFocus
@@ -68,15 +69,19 @@ export const ChatInput: FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
       />
       <motion.button
         type="submit"
-        disabled={isLoading || !message.trim()}
-        className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-sage-600 text-white rounded-lg font-medium hover:bg-sage-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        disabled={isLoading ? false : !message.trim()}
+        onClick={isLoading ? onStopGeneration : undefined}
+        className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-sage-600 text-white rounded-lg font-medium hover:bg-sage-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 min-w-[60px] justify-center"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
         {isLoading ? (
-          <Loader2 className="w-5 h-5 animate-spin" />
+          <>
+            <Square className="w-4 h-4" />
+            <span className="text-sm">Stop</span>
+          </>
         ) : (
-          <Send className="w-5 h-5" />
+          <Send className="w-4 h-4" />
         )}
       </motion.button>
     </form>

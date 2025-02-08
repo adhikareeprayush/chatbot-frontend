@@ -13,10 +13,11 @@ interface ChatContainerProps {
 }
 
 export const ChatContainer: FC<ChatContainerProps> = ({ onLogout }) => {
-  const { messages, isLoading, error, sendMessage } = useChat();
+  const { messages, isLoading, error, sendMessage, suggestedResponses, stopGeneration } = useChat();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageListRef = useRef<HTMLDivElement>(null);
 
   // Dummy chat history data
   const chatHistory = [
@@ -27,17 +28,26 @@ export const ChatContainer: FC<ChatContainerProps> = ({ onLogout }) => {
     { id: 5, title: "Feature Planning", date: "Last Week", unread: false },
   ];
 
+  // Scroll to bottom when new messages are added or during streaming
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  const handleSendMessage = async (text: string) => {
-    try {
-      await sendMessage(text);
-    } catch (error) {
-      console.error('Failed to send message:', error);
+    if (messagesEndRef.current) {
+      const messageList = messageListRef.current;
+      if (messageList) {
+        const isAtBottom = messageList.scrollHeight - messageList.scrollTop <= messageList.clientHeight + 100;
+        if (isAtBottom || isLoading) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
     }
-  };
+  }, [messages, isLoading]);
+
+  // Enable scrolling during streaming
+  useEffect(() => {
+    const messageList = messageListRef.current;
+    if (messageList) {
+      messageList.style.overflowY = 'auto';
+    }
+  }, [isLoading]);
 
   return (
     <div className="min-h-screen bg-sage-50 text-sage-900">
@@ -153,7 +163,10 @@ export const ChatContainer: FC<ChatContainerProps> = ({ onLogout }) => {
           <ErrorBoundary>
             <main className="flex-1 overflow-hidden flex flex-col relative">
               {/* Messages Area */}
-              <div className="flex-1 overflow-y-auto px-4 py-6 scroll-smooth">
+              <div 
+                ref={messageListRef}
+                className="flex-1 overflow-y-auto px-4 py-6 scroll-smooth"
+              >
                 <div className="max-w-screen-lg mx-auto">
                   {messages.length === 0 ? (
                     <EmptyState />
@@ -166,7 +179,7 @@ export const ChatContainer: FC<ChatContainerProps> = ({ onLogout }) => {
 
               {/* Error Display */}
               {error && (
-                <div className="mx-auto max-w-screen-lg px-4">
+                <div className="mx-auto max-w-screen-lg px-4 mb-4">
                   <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-600 animate-in">
                     <p className="text-sm font-medium">{error}</p>
                   </div>
@@ -175,8 +188,25 @@ export const ChatContainer: FC<ChatContainerProps> = ({ onLogout }) => {
 
               {/* Input Area */}
               <div className="p-4 border-t border-sage-100 bg-white sticky bottom-0">
-                <div className="max-w-screen-lg mx-auto">
-                  <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+                <div className="max-w-screen-lg mx-auto space-y-3">
+                  {suggestedResponses.length > 0 && !isLoading && (
+                    <div className="flex flex-wrap gap-2">
+                      {suggestedResponses.map((suggestion, index) => (
+                        <button
+                          key={index}
+                          onClick={() => sendMessage(suggestion)}
+                          className="px-4 py-2 bg-sage-50 hover:bg-sage-100 text-sage-700 rounded-full text-sm transition-colors"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <ChatInput 
+                    onSendMessage={sendMessage} 
+                    onStopGeneration={stopGeneration}
+                    isLoading={isLoading} 
+                  />
                 </div>
               </div>
             </main>
