@@ -35,20 +35,22 @@ export const MessageBubble: FC<MessageBubbleProps> = memo(({ message }) => {
         icon={isUser ? User : Bot}
         className={twMerge(
           "transition-transform duration-300 group-hover:scale-110",
-          isUser ? "bg-primary/20 border-primary/30" : "bg-surface/50 border-white/20"
+          isUser ? "bg-sage-600 text-white border-sage-700" : "bg-sage-100 text-sage-600 border-sage-200"
         )}
       />
       <div
         className={twMerge(
           "relative px-6 py-4 rounded-2xl max-w-[80%] break-words transition-all duration-300",
           isUser 
-            ? "bg-primary/10 border border-primary/20 hover:bg-primary/15" 
-            : "glass-effect hover:bg-surface/50"
+            ? "bg-sage-600 text-white" 
+            : "bg-white text-sage-800"
         )}
       >
-        <Markdown content={message.text} />
+        <div className={isUser ? "text-white" : "text-sage-800"}>
+          <Markdown content={message.text} isUserMessage={isUser} />
+        </div>
         <div className="absolute bottom-2 right-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <time className="text-xs text-text-secondary">
+          <time className={`text-xs ${isUser ? 'text-sage-100' : 'text-sage-400'}`}>
             {new Date(message.timestamp).toLocaleTimeString([], { 
               hour: '2-digit', 
               minute: '2-digit' 
@@ -57,13 +59,17 @@ export const MessageBubble: FC<MessageBubbleProps> = memo(({ message }) => {
           {!isUser && (
             <button
               onClick={handleCopy}
-              className="p-1 rounded-lg hover:bg-surface/50 transition-colors"
+              className={`p-1 rounded-lg transition-colors ${
+                isUser 
+                  ? 'hover:bg-sage-500/50' 
+                  : 'hover:bg-sage-100'
+              }`}
               title={copied ? "Copied!" : "Copy message"}
             >
               {copied ? (
-                <Check className="w-4 h-4 text-success" />
+                <Check className={`w-4 h-4 ${isUser ? 'text-sage-100' : 'text-sage-600'}`} />
               ) : (
-                <Copy className="w-4 h-4 text-text-secondary" />
+                <Copy className={`w-4 h-4 ${isUser ? 'text-sage-100' : 'text-sage-400'}`} />
               )}
             </button>
           )}

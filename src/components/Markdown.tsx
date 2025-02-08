@@ -15,15 +15,23 @@ export const Markdown: FC<MarkdownProps> = ({ content }) => {
       remarkPlugins={[remarkGfm]}
       rehypePlugins={[rehypeRaw, rehypeHighlight]}
       components={{
-        pre: ({ node, ...props }) => (
-          <pre className="bg-gray-800 p-4 rounded-lg overflow-x-auto" {...props} />
+        pre: ({ className, children, ...props }) => (
+          <pre className="bg-gray-800 p-4 rounded-lg overflow-x-auto" {...props}>
+            {children}
+          </pre>
         ),
-        code: ({ node, inline, ...props }) =>
-          inline ? (
-            <code className="bg-gray-800 px-1 py-0.5 rounded" {...props} />
+        code: ({ className, children, ...props }) => {
+          const match = /language-(\w+)/.exec(className || '');
+          return match ? (
+            <code className={className} {...props}>
+              {children}
+            </code>
           ) : (
-            <code {...props} />
-          ),
+            <code className="bg-gray-800 px-1 py-0.5 rounded" {...props}>
+              {children}
+            </code>
+          );
+        },
       }}
     >
       {content}

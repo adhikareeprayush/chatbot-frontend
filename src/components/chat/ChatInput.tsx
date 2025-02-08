@@ -21,7 +21,7 @@ export const ChatInput: FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    e.stopPropagation(); // Prevent event bubbling
+    e.stopPropagation();
     
     if (!message.trim() || isLoading) return;
 
@@ -43,7 +43,6 @@ export const ChatInput: FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      e.stopPropagation(); // Prevent event bubbling
       formRef.current?.requestSubmit();
     }
   };
@@ -61,7 +60,7 @@ export const ChatInput: FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Type your message..."
-        className="input w-full resize-none max-h-32 pr-24 min-h-[52px]"
+        className="w-full resize-none rounded-xl border border-sage-200 px-4 py-3 pr-24 focus:ring-2 focus:ring-sage-500 focus:border-transparent max-h-32 min-h-[52px] bg-white text-sage-800 placeholder-sage-400"
         disabled={isLoading}
         rows={1}
         autoFocus
@@ -70,7 +69,7 @@ export const ChatInput: FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
       <motion.button
         type="submit"
         disabled={isLoading || !message.trim()}
-        className="absolute right-2 top-1/2 -translate-y-1/2 btn btn-primary py-2"
+        className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-sage-600 text-white rounded-lg font-medium hover:bg-sage-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
