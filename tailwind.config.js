@@ -18,6 +18,18 @@ export default {
           primary: '#f8fafc',
           secondary: '#94a3b8',
         },
+        sage: {
+          50: '#f8faf8',
+          100: '#f0f4f1',
+          200: '#dce5dd',
+          300: '#bccebe',
+          400: '#9ab39c',
+          500: '#75917a',
+          600: '#5c735f',
+          700: '#4a5c4c',
+          800: '#3d4c3e',
+          900: '#2c372d',
+        },
       },
       typography: {
         DEFAULT: {

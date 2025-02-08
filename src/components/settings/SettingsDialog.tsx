@@ -19,7 +19,7 @@ export const SettingsDialog: FC<SettingsDialogProps> = ({ isOpen, onClose }) => 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
             onClick={onClose}
           />
           <motion.div
@@ -28,35 +28,35 @@ export const SettingsDialog: FC<SettingsDialogProps> = ({ isOpen, onClose }) => 
             exit={{ opacity: 0, y: -20 }}
             className="fixed top-20 right-6 w-full max-w-md z-50"
           >
-            <div className="glass-card p-6 overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
               {/* Header */}
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-primary bg-clip-text text-transparent">
-                  Customize Experience
+              <div className="px-6 py-4 border-b border-sage-100 flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-sage-800">
+                  Settings
                 </h2>
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-surface/50 rounded-lg transition-colors"
+                  className="p-2 hover:bg-sage-50 rounded-lg transition-colors"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-5 h-5 text-sage-600" />
                 </button>
               </div>
 
-              <div className="space-y-8">
+              <div className="p-6 space-y-8">
                 {/* AI Personality */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                      <MessageSquare className="w-4 h-4 text-primary-light" />
+                    <div className="w-8 h-8 rounded-lg bg-sage-50 flex items-center justify-center">
+                      <MessageSquare className="w-4 h-4 text-sage-600" />
                     </div>
-                    <label className="text-lg font-medium">
+                    <label className="text-lg font-medium text-sage-800">
                       AI Personality
                     </label>
                   </div>
                   <select
                     value={settings.aiPersonality}
                     onChange={(e) => updateSettings({ aiPersonality: e.target.value as any })}
-                    className="input w-full"
+                    className="w-full px-4 py-3 rounded-xl border border-sage-200 bg-white focus:ring-2 focus:ring-sage-500 focus:border-transparent"
                   >
                     <option value="default">Balanced Assistant</option>
                     <option value="professional">Professional Expert</option>
@@ -68,10 +68,10 @@ export const SettingsDialog: FC<SettingsDialogProps> = ({ isOpen, onClose }) => 
                 {/* Response Format */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                      <Layout className="w-4 h-4 text-primary-light" />
+                    <div className="w-8 h-8 rounded-lg bg-sage-50 flex items-center justify-center">
+                      <Layout className="w-4 h-4 text-sage-600" />
                     </div>
-                    <label className="text-lg font-medium">
+                    <label className="text-lg font-medium text-sage-800">
                       Response Format
                     </label>
                   </div>
@@ -82,8 +82,8 @@ export const SettingsDialog: FC<SettingsDialogProps> = ({ isOpen, onClose }) => 
                         onClick={() => updateSettings({ responseFormat: format as any })}
                         className={`p-4 rounded-xl border transition-all duration-200 ${
                           settings.responseFormat === format
-                            ? 'border-primary bg-primary/10'
-                            : 'border-white/10 hover:border-primary/50'
+                            ? 'border-sage-600 bg-sage-50 text-sage-800'
+                            : 'border-sage-200 hover:border-sage-400 text-sage-600'
                         }`}
                       >
                         <span className="capitalize">{format.replace(/([A-Z])/g, ' $1').trim()}</span>
@@ -95,15 +95,15 @@ export const SettingsDialog: FC<SettingsDialogProps> = ({ isOpen, onClose }) => 
                 {/* Code Blocks */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                      <Zap className="w-4 h-4 text-primary-light" />
+                    <div className="w-8 h-8 rounded-lg bg-sage-50 flex items-center justify-center">
+                      <Zap className="w-4 h-4 text-sage-600" />
                     </div>
-                    <label className="text-lg font-medium">
+                    <label className="text-lg font-medium text-sage-800">
                       Code Display
                     </label>
                   </div>
                   <div className="space-y-3">
-                    <label className="flex items-center gap-3 p-3 rounded-lg border border-white/10 hover:border-primary/50 transition-all duration-200">
+                    <label className="flex items-center gap-3 p-4 rounded-xl border border-sage-200 hover:border-sage-400 transition-all duration-200">
                       <input
                         type="checkbox"
                         checked={settings.codeBlocks.syntax}
@@ -112,14 +112,14 @@ export const SettingsDialog: FC<SettingsDialogProps> = ({ isOpen, onClose }) => 
                             codeBlocks: { ...settings.codeBlocks, syntax: e.target.checked }
                           })
                         }
-                        className="rounded border-white/20 bg-surface/50 text-primary focus:ring-primary"
+                        className="rounded border-sage-300 text-sage-600 focus:ring-sage-500"
                       />
                       <div>
-                        <span className="font-medium">Syntax Highlighting</span>
-                        <p className="text-sm text-text-secondary">Colorize code for better readability</p>
+                        <span className="font-medium text-sage-800">Syntax Highlighting</span>
+                        <p className="text-sm text-sage-600">Colorize code for better readability</p>
                       </div>
                     </label>
-                    <label className="flex items-center gap-3 p-3 rounded-lg border border-white/10 hover:border-primary/50 transition-all duration-200">
+                    <label className="flex items-center gap-3 p-4 rounded-xl border border-sage-200 hover:border-sage-400 transition-all duration-200">
                       <input
                         type="checkbox"
                         checked={settings.codeBlocks.lineNumbers}
@@ -128,11 +128,11 @@ export const SettingsDialog: FC<SettingsDialogProps> = ({ isOpen, onClose }) => 
                             codeBlocks: { ...settings.codeBlocks, lineNumbers: e.target.checked }
                           })
                         }
-                        className="rounded border-white/20 bg-surface/50 text-primary focus:ring-primary"
+                        className="rounded border-sage-300 text-sage-600 focus:ring-sage-500"
                       />
                       <div>
-                        <span className="font-medium">Line Numbers</span>
-                        <p className="text-sm text-text-secondary">Show line numbers in code blocks</p>
+                        <span className="font-medium text-sage-800">Line Numbers</span>
+                        <p className="text-sm text-sage-600">Show line numbers in code blocks</p>
                       </div>
                     </label>
                   </div>
