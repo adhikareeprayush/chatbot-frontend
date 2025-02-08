@@ -1,3 +1,4 @@
+/* Base styles */
 .glass-effect {
   backdrop-filter: blur(12px);
   background: rgba(255, 255, 255, 0.8);
@@ -33,7 +34,26 @@
 }
 
 .prose-invert {
-  @apply text-white;
+  @apply text-sage-100;
+}
+
+/* Headings */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  @apply text-sage-900 font-bold;
+}
+
+.prose-invert h1,
+.prose-invert h2,
+.prose-invert h3,
+.prose-invert h4,
+.prose-invert h5,
+.prose-invert h6 {
+  @apply text-sage-50 font-bold;
 }
 
 .prose a {
@@ -41,15 +61,25 @@
 }
 
 .prose-invert a {
-  @apply text-white hover:text-sage-100;
+  @apply text-sage-100 hover:text-white;
 }
 
+/* Update bold text styles for better contrast */
 .prose strong {
-  @apply text-sage-900;
+  @apply text-sage-900 font-bold;
 }
 
 .prose-invert strong {
-  @apply text-white;
+  @apply text-sage-50 font-bold;
+}
+
+/* Base text */
+.prose p {
+  @apply text-sage-800;
+}
+
+.prose-invert p {
+  @apply text-sage-100;
 }
 
 .prose ul {
@@ -65,23 +95,155 @@
 }
 
 .prose-invert blockquote {
-  @apply border-l-4 border-sage-100 pl-4 italic;
+  @apply border-l-4 border-sage-100/30 pl-4 italic;
 }
 
+/* Enhanced code block styles */
 .prose code {
-  @apply text-sage-700 bg-sage-50;
+  @apply text-sage-900 bg-sage-100 px-1.5 py-0.5 rounded text-sm font-mono;
 }
 
 .prose-invert code {
-  @apply text-white bg-sage-500/50;
+  @apply text-white bg-sage-600/80 px-1.5 py-0.5 rounded text-sm font-mono;
 }
 
 .prose pre {
-  @apply my-2 bg-sage-50;
+  @apply my-4 rounded-lg overflow-x-auto relative;
+}
+
+.prose pre code {
+  @apply block bg-sage-100 text-sage-900 p-4 text-sm leading-relaxed font-mono;
 }
 
 .prose-invert pre {
-  @apply my-2 bg-sage-500/50;
+  @apply bg-sage-800/90;
+}
+
+.prose-invert pre code {
+  @apply bg-transparent text-white p-4 text-sm leading-relaxed font-mono;
+}
+
+/* Enhanced syntax highlighting */
+.hljs {
+  @apply block overflow-x-auto p-4;
+  background: transparent;
+}
+
+/* Keywords */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-name,
+.hljs-tag {
+  @apply text-purple-600 font-semibold;
+}
+
+.prose-invert .hljs-keyword,
+.prose-invert .hljs-selector-tag,
+.prose-invert .hljs-built_in,
+.prose-invert .hljs-name,
+.prose-invert .hljs-tag {
+  @apply text-purple-300 font-semibold;
+}
+
+/* Strings */
+.hljs-string,
+.hljs-title,
+.hljs-section,
+.hljs-attribute,
+.hljs-literal,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type {
+  @apply text-emerald-600;
+}
+
+.prose-invert .hljs-string,
+.prose-invert .hljs-title,
+.prose-invert .hljs-section,
+.prose-invert .hljs-attribute,
+.prose-invert .hljs-literal,
+.prose-invert .hljs-template-tag,
+.prose-invert .hljs-template-variable,
+.prose-invert .hljs-type {
+  @apply text-emerald-300;
+}
+
+/* Numbers */
+.hljs-number,
+.hljs-literal {
+  @apply text-amber-600;
+}
+
+.prose-invert .hljs-number,
+.prose-invert .hljs-literal {
+  @apply text-amber-300;
+}
+
+/* Comments */
+.hljs-comment,
+.hljs-quote {
+  @apply text-sage-500 italic;
+}
+
+.prose-invert .hljs-comment,
+.prose-invert .hljs-quote {
+  @apply text-sage-400 italic;
+}
+
+/* Functions */
+.hljs-function,
+.hljs-function .hljs-keyword,
+.hljs-decorator {
+  @apply text-blue-600 font-medium;
+}
+
+.prose-invert .hljs-function,
+.prose-invert .hljs-function .hljs-keyword,
+.prose-invert .hljs-decorator {
+  @apply text-blue-300 font-medium;
+}
+
+/* Variables */
+.hljs-variable,
+.hljs-attr {
+  @apply text-rose-600;
+}
+
+.prose-invert .hljs-variable,
+.prose-invert .hljs-attr {
+  @apply text-rose-300;
+}
+
+/* Class names */
+.hljs-title.class_,
+.hljs-title.function_ {
+  @apply text-yellow-600 font-semibold;
+}
+
+.prose-invert .hljs-title.class_,
+.prose-invert .hljs-title.function_ {
+  @apply text-yellow-300 font-semibold;
+}
+
+/* Python specific */
+.hljs-meta,
+.hljs-meta .hljs-keyword {
+  @apply text-cyan-600 font-medium;
+}
+
+.prose-invert .hljs-meta,
+.prose-invert .hljs-meta .hljs-keyword {
+  @apply text-cyan-300 font-medium;
+}
+
+/* Regex */
+.hljs-regexp {
+  @apply text-red-600;
+}
+
+.prose-invert .hljs-regexp {
+  @apply text-red-300;
 }
 
 .prose table {
@@ -98,12 +260,12 @@
 }
 
 .prose-invert table {
-  @apply border-sage-100;
+  @apply border-sage-100/30;
 }
 
 .prose-invert th,
 .prose-invert td {
-  @apply border-sage-100;
+  @apply border-sage-100/30;
 }
 
 .prose-invert th {
