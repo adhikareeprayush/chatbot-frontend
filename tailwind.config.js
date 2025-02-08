@@ -34,22 +34,42 @@ export default {
       typography: {
         DEFAULT: {
           css: {
-            color: '#f3f4f6',
+            color: '#3d4c3e',
             a: {
-              color: '#60a5fa',
+              color: '#5c735f',
               '&:hover': {
-                color: '#93c5fd',
+                color: '#4a5c4c',
               },
             },
             strong: {
-              color: '#f9fafb',
+              color: '#2c372d',
             },
             code: {
-              color: '#93c5fd',
+              color: '#4a5c4c',
             },
             pre: {
-              backgroundColor: '#1f2937',
+              backgroundColor: '#f0f4f1',
             },
+          },
+        },
+        sage: {
+          css: {
+            '--tw-prose-body': '#3d4c3e',
+            '--tw-prose-headings': '#2c372d',
+            '--tw-prose-lead': '#4a5c4c',
+            '--tw-prose-links': '#5c735f',
+            '--tw-prose-bold': '#2c372d',
+            '--tw-prose-counters': '#75917a',
+            '--tw-prose-bullets': '#75917a',
+            '--tw-prose-hr': '#dce5dd',
+            '--tw-prose-quotes': '#2c372d',
+            '--tw-prose-quote-borders': '#75917a',
+            '--tw-prose-captions': '#75917a',
+            '--tw-prose-code': '#4a5c4c',
+            '--tw-prose-pre-code': '#4a5c4c',
+            '--tw-prose-pre-bg': '#f0f4f1',
+            '--tw-prose-th-borders': '#bccebe',
+            '--tw-prose-td-borders': '#dce5dd',
           },
         },
       },

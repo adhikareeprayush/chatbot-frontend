@@ -60,7 +60,7 @@ export const ChatInput: FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Type your message..."
-        className="w-full resize-none rounded-lg border border-sage-200 px-4 py-3 pr-24 focus:ring-2 focus:ring-sage-500 focus:border-transparent max-h-32 min-h-[52px] bg-white text-sage-900 placeholder-sage-400"
+        className="w-full resize-none rounded-xl border border-sage-200 px-4 py-3 pr-24 focus:ring-2 focus:ring-sage-500 focus:border-transparent max-h-32 min-h-[52px] bg-white text-sage-800 placeholder-sage-400"
         disabled={isLoading}
         rows={1}
         autoFocus

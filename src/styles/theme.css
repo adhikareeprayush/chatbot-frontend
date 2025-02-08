@@ -1,11 +1,11 @@
 .glass-effect {
   backdrop-filter: blur(12px);
-  background: rgba(30, 41, 59, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .glass-card {
-  @apply glass-effect rounded-2xl shadow-xl;
+  @apply glass-effect rounded-2xl shadow-lg;
 }
 
 .btn {
@@ -13,16 +13,99 @@
 }
 
 .btn-primary {
-  @apply bg-primary hover:bg-primary-dark text-white disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply bg-sage-600 hover:bg-sage-700 text-white disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
 .btn-secondary {
-  @apply bg-secondary/20 hover:bg-secondary/30 text-white disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply bg-sage-100 hover:bg-sage-200 text-sage-700 disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
 .input {
-  @apply bg-surface/50 border border-white/10 rounded-xl px-4 py-3 
-         focus:outline-none focus:ring-2 focus:ring-primary/50 
-         placeholder-text-secondary transition-all duration-200
+  @apply bg-white border border-sage-200 rounded-xl px-4 py-3 
+         focus:outline-none focus:ring-2 focus:ring-sage-500/50 
+         placeholder-sage-400 transition-all duration-200
          disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* Markdown Styles */
+.prose {
+  @apply text-sage-800;
+}
+
+.prose-invert {
+  @apply text-white;
+}
+
+.prose a {
+  @apply text-sage-600 hover:text-sage-700;
+}
+
+.prose-invert a {
+  @apply text-white hover:text-sage-100;
+}
+
+.prose strong {
+  @apply text-sage-900;
+}
+
+.prose-invert strong {
+  @apply text-white;
+}
+
+.prose ul {
+  @apply list-disc list-inside;
+}
+
+.prose ol {
+  @apply list-decimal list-inside;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-sage-200 pl-4 italic;
+}
+
+.prose-invert blockquote {
+  @apply border-l-4 border-sage-100 pl-4 italic;
+}
+
+.prose code {
+  @apply text-sage-700 bg-sage-50;
+}
+
+.prose-invert code {
+  @apply text-white bg-sage-500/50;
+}
+
+.prose pre {
+  @apply my-2 bg-sage-50;
+}
+
+.prose-invert pre {
+  @apply my-2 bg-sage-500/50;
+}
+
+.prose table {
+  @apply border-collapse border border-sage-200;
+}
+
+.prose th,
+.prose td {
+  @apply border border-sage-200 px-3 py-1;
+}
+
+.prose th {
+  @apply bg-sage-50;
+}
+
+.prose-invert table {
+  @apply border-sage-100;
+}
+
+.prose-invert th,
+.prose-invert td {
+  @apply border-sage-100;
+}
+
+.prose-invert th {
+  @apply bg-sage-500/50;
 }
