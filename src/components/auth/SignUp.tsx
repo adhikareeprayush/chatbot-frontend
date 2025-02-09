@@ -1,6 +1,7 @@
 import { FC, useState } from 'react';
 import { Bot, Mail, Lock, User } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../../hooks/useAuth';
 
 interface SignUpProps {
   onSignIn: () => void;
@@ -9,12 +10,29 @@ interface SignUpProps {
 export const SignUp: FC<SignUpProps> = ({ onSignIn }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const { register, isLoading } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // For now, just redirect to sign in
-    onSignIn();
+    setError('');
+
+    try {
+      const success = await register({
+        fullname: name,
+        email,
+        username,
+        password,
+      });
+
+      if (success) {
+        onSignIn(); // Redirect to sign in after successful registration
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Registration failed');
+    }
   };
 
   return (
@@ -32,6 +50,12 @@ export const SignUp: FC<SignUpProps> = ({ onSignIn }) => {
           </div>
 
           <div className="bg-white p-8 rounded-lg shadow-sm">
+            {error && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-100 text-red-600 rounded-lg">
+                {error}
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-sage-700 mb-2">
@@ -45,6 +69,23 @@ export const SignUp: FC<SignUpProps> = ({ onSignIn }) => {
                     onChange={(e) => setName(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 border border-sage-200 rounded-lg focus:ring-2 focus:ring-sage-500 focus:border-transparent"
                     placeholder="Enter your name"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-sage-700 mb-2">
+                  Username
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-sage-400" />
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-sage-200 rounded-lg focus:ring-2 focus:ring-sage-500 focus:border-transparent"
+                    placeholder="Choose a username"
                     required
                   />
                 </div>
@@ -86,9 +127,14 @@ export const SignUp: FC<SignUpProps> = ({ onSignIn }) => {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-sage-700 text-white rounded-lg font-medium hover:bg-sage-800 transition-colors"
+                disabled={isLoading}
+                className="w-full py-3 bg-sage-700 text-white rounded-lg font-medium hover:bg-sage-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                Create Account
+                {isLoading ? (
+                  <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  'Create Account'
+                )}
               </button>
             </form>
           </div>

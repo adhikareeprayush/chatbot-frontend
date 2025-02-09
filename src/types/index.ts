@@ -1,3 +1,13 @@
+export interface User {
+  _id: string;
+  username: string;
+  email: string;
+  fullname: string;
+  chatHistory: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Message {
   id: string;
   sender: 'user' | 'bot';
@@ -7,28 +17,19 @@ export interface Message {
   seen?: boolean;
 }
 
-export interface Conversation {
-  id: string;
-  title: string;
-  messages: Message[];
-}
-
 export interface ChatState {
   messages: Message[];
   isLoading: boolean;
   error: string | null;
   isTyping: boolean;
-  conversations: Conversation[];
-  currentConversationId: string | null;
   suggestedResponses: string[];
 }
 
-export interface ApiResponse {
-  candidates: Array<{
-    content: {
-      parts: Array<{ text: string }>;
-    };
-  }>;
+export interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
 }
 
 export interface Settings {
@@ -38,4 +39,10 @@ export interface Settings {
     syntax: boolean;
     lineNumbers: boolean;
   };
+}
+
+export interface ApiResponse {
+  success: boolean;
+  data: any;
+  message: string;
 }
