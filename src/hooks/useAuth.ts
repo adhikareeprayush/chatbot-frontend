@@ -15,22 +15,24 @@ export const useAuth = () => {
 
   const login = useCallback(async (email: string, password: string) => {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
-    try {
-      const response = await loginUser(email, password);
+
+    const response = await loginUser(email, password);
+    console.log("Response from login: ", response)
+
+    if(response) {
+      console.log("Response from login: ", response.data)
       setState({
-        user: response.data,
+        user: null,
         isAuthenticated: true,
         isLoading: false,
         error: null,
       });
+      console.log(state);
       return true;
-    } catch (error) {
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: getErrorMessage(error),
-      }));
-      return false;
+    }
+    else {
+      // console.log("Error from login: ", response.message)
+      throw new Error(response|| 'Login failed');
     }
   }, []);
 
@@ -62,13 +64,22 @@ export const useAuth = () => {
   const checkAuth = useCallback(async () => {
     setState(prev => ({ ...prev, isLoading: true }));
     try {
-      const response = await getCurrentUser();
-      setState({
-        user: response.data,
-        isAuthenticated: true,
-        isLoading: false,
-        error: null,
-      });
+      // get accessToken from local storage
+      const accessToken = localStorage.getItem('chatAccessToken');
+      
+      if (!accessToken) {
+        throw new Error('Access token not found');
+      }
+      else {
+        const response = await getCurrentUser();
+        setState({
+          user: response.data,
+          isAuthenticated: true,
+          isLoading: false,
+          error: null,
+        });
+        return true
+      }
     } catch (error) {
       setState({
         user: null,
@@ -81,6 +92,8 @@ export const useAuth = () => {
 
   const logout = useCallback(() => {
     setState(initialState);
+    localStorage.removeItem('chatAccessToken');
+    localStorage.removeItem('chatRefreshToken');
   }, []);
 
   return {

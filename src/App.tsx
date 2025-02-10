@@ -11,16 +11,20 @@ type Page = 'landing' | 'signin' | 'signup' | 'chat';
 
 const App = () => {
   const [currentPage, setCurrentPage] = useState<Page>('landing');
-  const { isAuthenticated, isLoading, checkAuth, login, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, checkAuth, login, logout } = useAuth();
   
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
-
-  useEffect(() => {
+  const checkAuthentication = async () => {
+    await checkAuth();
     if (isAuthenticated) {
       setCurrentPage('chat');
+    } else {
+      setCurrentPage('landing');
     }
+  };
+  
+  useEffect(() => {
+    checkAuthentication();
+    console.log("User in App: ", user);
   }, [isAuthenticated]);
 
   if (isLoading) {
@@ -33,7 +37,8 @@ const App = () => {
 
   const handleLogin = async (email: string, password: string) => {
     const success = await login(email, password);
-    if (success) {
+    console.log("Login Response: ", success);
+    if (isAuthenticated && success) {
       setCurrentPage('chat');
     }
   };

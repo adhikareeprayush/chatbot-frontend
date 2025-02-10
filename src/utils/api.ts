@@ -1,4 +1,5 @@
 import { ApiResponse } from '../types';
+import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:5000/api/v1';
 
@@ -7,7 +8,6 @@ export const loginUser = async (email: string, password: string): Promise<ApiRes
   const response = await fetch(`${API_BASE_URL}/users/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include', // Important for handling cookies
     body: JSON.stringify({ email, password }),
   });
 
@@ -15,8 +15,18 @@ export const loginUser = async (email: string, password: string): Promise<ApiRes
     const error = await response.json();
     throw new Error(error.message || 'Login failed');
   }
+  
+  // save the accessToken and refreshToken in local storage
+  const responseData = await response.json();
+  console.log("Response.json: ", responseData);
+  localStorage.setItem('chatAccessToken', responseData.data.accessToken);
+  localStorage.setItem('chatRefreshToken', responseData.data.refreshToken);
 
-  return response.json();
+  // console.log("Access Token: ", localStorage.getItem('chatAccessToken'));
+  // console.log("Refresh Token: ", localStorage.getItem('chatRefreshToken'));
+
+  console.log("Response Data: ", responseData);
+  return responseData;
 };
 
 export const registerUser = async (data: {
@@ -52,15 +62,26 @@ export const registerUser = async (data: {
 };
 
 export const getCurrentUser = async (): Promise<ApiResponse> => {
-  const response = await fetch(`${API_BASE_URL}/users/me`, {
-    credentials: 'include',
-  });
+  // const response = await fetch(`${API_BASE_URL}/users/me`, {
+  //   method: "GET",
+  //   mode: "cors",
+  //   credentials: "include",
+  // });
 
-  if (!response.ok) {
+  const response = await axios.get(`${API_BASE_URL}/users/me`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('chatAccessToken')}`,
+    },
+  });
+  
+  // console.log("Current user response: ", response);
+  
+  if (!response) {
     throw new Error('Failed to get current user');
   }
 
-  return response.json();
+  console.log("From getCurrentUser: ", response.data);
+  return response.data;
 };
 
 // Chat APIs

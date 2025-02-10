@@ -6,9 +6,10 @@ interface ChatInputProps {
   onSendMessage: (message: string) => Promise<void>;
   onStopGeneration: () => void;
   isLoading: boolean;
+  placeholder?: string;
 }
 
-export const ChatInput: FC<ChatInputProps> = ({ onSendMessage, onStopGeneration, isLoading }) => {
+export const ChatInput: FC<ChatInputProps> = ({ onSendMessage, onStopGeneration, isLoading, placeholder }) => {
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -60,7 +61,7 @@ export const ChatInput: FC<ChatInputProps> = ({ onSendMessage, onStopGeneration,
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Type your message..."
+        placeholder={placeholder}
         className="w-full resize-none rounded-xl border border-sage-200 px-4 py-3 pr-[4.5rem] focus:ring-2 focus:ring-sage-500 focus:border-transparent max-h-32 min-h-[52px] bg-white text-sage-800 placeholder-sage-400"
         disabled={isLoading}
         rows={1}

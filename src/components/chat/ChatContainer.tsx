@@ -7,6 +7,7 @@ import { useChat } from '../../hooks/useChat';
 import { Settings, LogOut, Menu, X, MessageSquare, Plus } from 'lucide-react';
 import { SettingsDialog } from '../settings/SettingsDialog';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../../hooks/useAuth';
 
 interface ChatContainerProps {
   onLogout: () => void;
@@ -15,9 +16,16 @@ interface ChatContainerProps {
 export const ChatContainer: FC<ChatContainerProps> = ({ onLogout }) => {
   const { messages, isLoading, error, sendMessage, suggestedResponses, stopGeneration } = useChat();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const { user, checkAuth} = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageListRef = useRef<HTMLDivElement>(null);
+
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
 
   // Dummy chat history data
   const chatHistory = [
@@ -204,6 +212,7 @@ export const ChatContainer: FC<ChatContainerProps> = ({ onLogout }) => {
                   )}
                   <ChatInput 
                     onSendMessage={sendMessage} 
+                    placeholder={`Type a message ${user?.fullname}`}
                     onStopGeneration={stopGeneration}
                     isLoading={isLoading} 
                   />
