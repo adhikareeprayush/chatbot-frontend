@@ -1,43 +1,80 @@
 import { ApiResponse } from '../types';
 
-export class ApiError extends Error {
-  constructor(public status: number, message: string) {
-    super(message);
-    this.name = 'ApiError';
+const API_BASE_URL = 'http://localhost:5000/api/v1';
+
+// User APIs
+export const loginUser = async (email: string, password: string): Promise<ApiResponse> => {
+  const response = await fetch(`${API_BASE_URL}/users/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include', // Important for handling cookies
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Login failed');
   }
-}
 
-export const sendChatMessage = async (prompt: string): Promise<string> => {
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-        }),
-      }
-    );
+  return response.json();
+};
 
-    if (!response.ok) {
-      throw new ApiError(response.status, 'Failed to get response from API');
-    }
+export const registerUser = async (data: {
+  fullname: string;
+  email: string;
+  username: string;
+  password: string;
+}): Promise<ApiResponse> => {
+  const response = await fetch(`${API_BASE_URL}/users/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(data),
+  });
 
-    const data: ApiResponse = await response.json();
-    
-    if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
-      throw new Error('Invalid response format from API');
-    }
-
-    return data.candidates[0].content.parts[0].text;
-  } catch (error) {
-    if (error instanceof ApiError) {
-      throw error;
-    }
-    if (error instanceof TypeError) {
-      throw new Error('Network error. Please check your connection.');
-    }
-    throw new Error('An unexpected error occurred. Please try again.');
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Registration failed');
   }
+
+  const result = await response.json();
+
+  // After successful registration, automatically log in the user
+  if (result.success) {
+    try {
+      await loginUser(data.email, data.password);
+    } catch (error) {
+      console.error('Auto-login after registration failed:', error);
+    }
+  }
+
+  return result;
+};
+
+export const getCurrentUser = async (): Promise<ApiResponse> => {
+  const response = await fetch(`${API_BASE_URL}/users/me`, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to get current user');
+  }
+
+  return response.json();
+};
+
+// Chat APIs
+export const sendChatMessage = async (prompt: string, userId: string): Promise<ApiResponse> => {
+  const response = await fetch(`${API_BASE_URL}/chat/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ prompt, userId }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to get response');
+  }
+
+  return response.json();
 };
