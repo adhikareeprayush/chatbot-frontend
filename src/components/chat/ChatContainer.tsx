@@ -8,33 +8,45 @@ import { Settings, LogOut, Menu, X, MessageSquare, Plus } from 'lucide-react';
 import { SettingsDialog } from '../settings/SettingsDialog';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../hooks/useAuth';
-
+import { startChat } from '../../utils/api';
 interface ChatContainerProps {
   onLogout: () => void;
 }
 
 export const ChatContainer: FC<ChatContainerProps> = ({ onLogout }) => {
-  const { messages, isLoading, error, sendMessage, suggestedResponses, stopGeneration } = useChat();
+  const { messages, isLoading, error, sendMessage, suggestedResponses, stopGeneration, getHistories, getHistory } = useChat();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  interface ChatHistory {
+    id: string;
+    title: string;
+    date: string;
+  }
+  
+  const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
+  const hasStartedChat = useRef(false); // Track if startChat was called
+  const [currentSession, setCurrentSession] = useState('');
   const { user, checkAuth} = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageListRef = useRef<HTMLDivElement>(null);
 
-
   useEffect(() => {
-    checkAuth();
-  }, []);
-
-
-  // Dummy chat history data
-  const chatHistory = [
-    { id: 1, title: "Project Discussion", date: "Today", unread: true },
-    { id: 2, title: "Technical Support", date: "Today", unread: false },
-    { id: 3, title: "Code Review", date: "Yesterday", unread: false },
-    { id: 4, title: "Bug Analysis", date: "Yesterday", unread: false },
-    { id: 5, title: "Feature Planning", date: "Last Week", unread: false },
-  ];
+    const authenticateAndStartChat = async () => {
+      await checkAuth();
+      if (user?._id && !hasStartedChat.current) {
+        hasStartedChat.current = true;
+        try {
+          const response = await startChat(user._id);
+          setCurrentSession(response.data.sessionId);
+          updateChatTitle();
+        } catch (err) {
+          console.error('Failed to start chat:', err);
+        }
+      }
+    };
+    authenticateAndStartChat();
+  }, [user]);
+  
 
   // Scroll to bottom when new messages are added or during streaming
   useEffect(() => {
@@ -56,6 +68,112 @@ export const ChatContainer: FC<ChatContainerProps> = ({ onLogout }) => {
       messageList.style.overflowY = 'auto';
     }
   }, [isLoading]);
+
+  const handleNewChat = async () => {
+    if (!user?._id) return; // Ensure user is authenticated
+  
+    try {
+      const response = await startChat(user._id);
+      const newSessionId = response.data.sessionId;
+      console.log("New Chat Session ID:", newSessionId);
+  
+      setCurrentSession(newSessionId);
+      messages.splice(0, messages.length); // Clear messages
+  
+      // Wait for AI to generate the summary before adding to sidebar
+      await updateChatTitle(); 
+    } catch (err) {
+      console.error("Error starting new chat:", err);
+    }
+  };
+  
+  const updateChatTitle = async () => {
+    if (!user?._id) return;
+    try {
+      const histories = await getHistories(user._id);
+      if (histories.success) {
+        const sessionIds = histories.data;
+        const chatsSummaries = await Promise.all(
+          sessionIds.map((sessionId: string) => getHistory(user._id, sessionId))
+        );
+
+        const formattedChatHistories = chatsSummaries.map((chat, index) => ({
+          id: sessionIds[index],
+          title: chat.data[0]?.summary || 'Untitled Chat',
+          date: new Date().toISOString(),
+        }));
+
+        setChatHistories(() => {
+          const newChat = {
+            id: currentSession,
+            title: messages[0]?.text || 'New Chat',
+            date: new Date().toISOString(),
+          };
+          const mergedChats = [newChat, ...formattedChatHistories].filter(
+            (chat, index, self) => index === self.findIndex((c) => c.id === chat.id)
+          );
+          return mergedChats.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching chat histories:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (currentSession && user?._id) {
+      // Fetch messages for the selected session when the currentSession changes
+      const fetchMessages = async () => {
+        try {
+          // Fetch messages using the current session ID
+          const fetchedMessages = await getHistory(user._id, currentSession);
+          // You can now set these messages in your state (for example: setMessages(fetchedMessages))
+          console.log("Fetched Messages:", fetchedMessages);
+
+          if (fetchedMessages?.data?.length) {
+            // Format the messages, pairing prompt and response as separate messages
+            const formattedMessages = fetchedMessages.data.flatMap((msg: any) => [
+              {
+                id: `${msg._id}-prompt`, // Create unique ID for prompt
+                sender: 'user', // Sender is user for prompt
+                text: msg.prompt || '', // Use the prompt as user message
+                timestamp: new Date(msg.createdAt), // Convert createdAt to timestamp
+                isStreaming: false, // Set streaming as false by default
+                seen: false, // Set seen status
+              },
+              {
+                id: `${msg._id}-response`, // Create unique ID for response
+                sender: 'bot', // Sender is bot for response
+                text: msg.response || '', // Use the response as bot message
+                timestamp: new Date(msg.updatedAt), // Use updatedAt as timestamp
+                isStreaming: false, // Set streaming as false by default
+                seen: false, // Set seen status
+              }
+            ]);
+
+          console.log("Formatted Messages:", formattedMessages);
+          
+          messages.splice(0, messages.length, ...formattedMessages);
+
+        } }
+        catch (err) {
+          console.error('Error fetching messages:', err);
+        }
+      };
+  
+      fetchMessages();
+    }
+  }, [currentSession, user?._id]);
+  
+
+  const handleSendMessage = async (message: string) => {
+    if (!message.trim() || !user?._id || !currentSession) return;
+    await sendMessage(message, user._id, currentSession);
+    updateChatTitle();
+  };
+  
+  
+  
 
   return (
     <div className="min-h-screen bg-sage-50 text-sage-900">
@@ -103,17 +221,24 @@ export const ChatContainer: FC<ChatContainerProps> = ({ onLogout }) => {
             </div>
             
             <div className="p-3">
-              <button className="w-full flex items-center gap-2 px-4 py-3 bg-sage-50 hover:bg-sage-100 rounded-xl text-sage-700 font-medium transition-colors">
+              <button className="w-full flex items-center gap-2 px-4 py-3 bg-sage-50 hover:bg-sage-100 rounded-xl text-sage-700 font-medium transition-colors"
+                onClick={handleNewChat}
+              >
                 <Plus className="w-5 h-5" />
                 New Chat
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
-              {chatHistory.map((chat) => (
+            {chatHistories
+              .filter((chat) => chat.title !== 'New Chat') // Exclude "New Chat" entries
+              .map((chat) => (
                 <button
                   key={chat.id}
-                  className="w-full p-3 text-left rounded-xl hover:bg-sage-50 transition-all duration-200 group relative"
+                  className={`w-full p-3 text-left rounded-xl transition-all duration-200 group relative ${
+                    currentSession === chat.id ? "bg-sage-100" : "hover:bg-sage-50"
+                  }`}
+                  onClick={() => setCurrentSession(chat.id)}
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-sage-100 flex items-center justify-center">
@@ -123,12 +248,10 @@ export const ChatContainer: FC<ChatContainerProps> = ({ onLogout }) => {
                       <div className="font-medium text-sage-800 truncate">{chat.title}</div>
                       <div className="text-sm text-sage-500">{chat.date}</div>
                     </div>
-                    {chat.unread && (
-                      <div className="w-2 h-2 rounded-full bg-sage-600 absolute right-3" />
-                    )}
                   </div>
                 </button>
               ))}
+
             </div>
           </div>
         </motion.aside>
@@ -202,7 +325,7 @@ export const ChatContainer: FC<ChatContainerProps> = ({ onLogout }) => {
                       {suggestedResponses.map((suggestion, index) => (
                         <button
                           key={index}
-                          onClick={() => sendMessage(suggestion)}
+                          onClick={() => user?._id && sendMessage(suggestion, user._id, currentSession)}
                           className="px-4 py-2 bg-sage-50 hover:bg-sage-100 text-sage-700 rounded-full text-sm transition-colors"
                         >
                           {suggestion}
@@ -211,7 +334,9 @@ export const ChatContainer: FC<ChatContainerProps> = ({ onLogout }) => {
                     </div>
                   )}
                   <ChatInput 
-                    onSendMessage={sendMessage} 
+                    onSendMessage={handleSendMessage}
+                    userId={user?._id || ''}
+                    sessionId={currentSession}
                     placeholder={`Type a message ${user?.fullname}`}
                     onStopGeneration={stopGeneration}
                     isLoading={isLoading} 

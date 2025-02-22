@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { User, AuthState } from '../types';
+import {  AuthState } from '../types';
 import { loginUser, registerUser, getCurrentUser } from '../utils/api';
 import { getErrorMessage } from '../utils/errorMessages';
 
@@ -17,17 +17,17 @@ export const useAuth = () => {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     const response = await loginUser(email, password);
-    console.log("Response from login: ", response)
+    // console.log("Response from login: ", response)
 
     if(response) {
-      console.log("Response from login: ", response.data)
+      // console.log("Response from login: ", response.data)
       setState({
         user: null,
         isAuthenticated: true,
         isLoading: false,
         error: null,
       });
-      console.log(state);
+      // console.log(state);
       return true;
     }
     else {

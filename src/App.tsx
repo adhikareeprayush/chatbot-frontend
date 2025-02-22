@@ -11,7 +11,7 @@ type Page = 'landing' | 'signin' | 'signup' | 'chat';
 
 const App = () => {
   const [currentPage, setCurrentPage] = useState<Page>('landing');
-  const { user, isAuthenticated, isLoading, checkAuth, login, logout } = useAuth();
+  const { isAuthenticated, isLoading, checkAuth, login, logout } = useAuth();
   
   const checkAuthentication = async () => {
     await checkAuth();
@@ -24,7 +24,6 @@ const App = () => {
   
   useEffect(() => {
     checkAuthentication();
-    console.log("User in App: ", user);
   }, [isAuthenticated]);
 
   if (isLoading) {

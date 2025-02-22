@@ -22,10 +22,29 @@ export const loginUser = async (email: string, password: string): Promise<ApiRes
   localStorage.setItem('chatAccessToken', responseData.data.accessToken);
   localStorage.setItem('chatRefreshToken', responseData.data.refreshToken);
 
+
   // console.log("Access Token: ", localStorage.getItem('chatAccessToken'));
   // console.log("Refresh Token: ", localStorage.getItem('chatRefreshToken'));
 
   console.log("Response Data: ", responseData);
+  return responseData;
+};
+
+export const startChat = async (userId: string): Promise<ApiResponse> => {
+  console.log(userId);
+  const response = await fetch(`${API_BASE_URL}/chat/start`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ userId }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to start chat');
+  }
+
+  const responseData = await response.json();
   return responseData;
 };
 
@@ -61,12 +80,29 @@ export const registerUser = async (data: {
   return result;
 };
 
-export const getCurrentUser = async (): Promise<ApiResponse> => {
-  // const response = await fetch(`${API_BASE_URL}/users/me`, {
-  //   method: "GET",
-  //   mode: "cors",
-  //   credentials: "include",
-  // });
+export const getChatHistory = async (userId: string, sessionId: string ) => {
+  const response = await axios.get(`${API_BASE_URL}/chat/${userId}/${sessionId}`)
+
+
+  if(!response) {
+    throw new Error('Failed to get chat history');
+  }
+  return response.data;
+}
+
+  export const getChatHistories = async (userId: string): Promise<ApiResponse> => {
+    // console.log(localStorage.getItem('chatAccessToken'));
+    const response = await axios.get(`${API_BASE_URL}/chat/history/${userId}`);
+
+    if (!response) {
+      throw new Error('Failed to get chat histories');
+    }
+
+    return response.data;
+  }
+
+
+  export const getCurrentUser = async (): Promise<ApiResponse> => {
 
   const response = await axios.get(`${API_BASE_URL}/users/me`, {
     headers: {
@@ -74,23 +110,21 @@ export const getCurrentUser = async (): Promise<ApiResponse> => {
     },
   });
   
-  // console.log("Current user response: ", response);
   
   if (!response) {
     throw new Error('Failed to get current user');
   }
 
-  console.log("From getCurrentUser: ", response.data);
   return response.data;
 };
 
 // Chat APIs
-export const sendChatMessage = async (prompt: string, userId: string): Promise<ApiResponse> => {
-  const response = await fetch(`${API_BASE_URL}/chat/generate`, {
+export const sendChatMessage = async (prompt: string, userId: string, sessionId: string): Promise<ApiResponse> => {
+  const response = await fetch(`${API_BASE_URL}/chat/send`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({ prompt, userId }),
+    body: JSON.stringify({ prompt, userId, sessionId }),
   });
 
   if (!response.ok) {

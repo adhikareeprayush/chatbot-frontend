@@ -3,13 +3,15 @@ import { Send, Square } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface ChatInputProps {
-  onSendMessage: (message: string) => Promise<void>;
+  onSendMessage: (message: string, userId: string, sessionId: string) => Promise<void>;
   onStopGeneration: () => void;
+  userId: string,
+  sessionId: string;
   isLoading: boolean;
   placeholder?: string;
 }
 
-export const ChatInput: FC<ChatInputProps> = ({ onSendMessage, onStopGeneration, isLoading, placeholder }) => {
+export const ChatInput: FC<ChatInputProps> = ({ onSendMessage, onStopGeneration, isLoading, placeholder, userId, sessionId }) => {
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -35,7 +37,7 @@ export const ChatInput: FC<ChatInputProps> = ({ onSendMessage, onStopGeneration,
     }
 
     try {
-      await onSendMessage(currentMessage);
+      await onSendMessage(currentMessage, userId, sessionId );
     } catch (error) {
       setMessage(currentMessage);
       console.error('Failed to send message:', error);

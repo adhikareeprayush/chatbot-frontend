@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { Message, ChatState } from '../types';
-import { sendChatMessage } from '../utils/api';
+import { getChatHistory, sendChatMessage, getChatHistories } from '../utils/api';
 import { useSettings } from './useSettings';
 import { getErrorMessage } from '../utils/errorMessages';
 
@@ -34,6 +34,15 @@ export const useChat = () => {
     }));
 
     return messageId;
+  }, []);
+
+  const startChat = useCallback(async (userId: string) => {
+    try {
+      const response = await startChat(userId);
+      console.log("Response from startChat: ", response)
+    } catch (error) {
+      console.error("Error in startChat: ", error)
+    }
   }, []);
 
   const updateMessage = useCallback((id: string, text: string, isStreaming = false) => {
@@ -75,7 +84,27 @@ export const useChat = () => {
     }
   }, []);
 
-  const sendMessage = useCallback(async (prompt: string) => {
+  const getHistory = useCallback(async (userId: string, sessionId: string) => {
+    try{
+        const response = await getChatHistory(userId, sessionId);
+        return response;
+
+    } catch{
+      throw new Error('Failed to getHistory');
+    }
+  }, []);
+
+  const getHistories = useCallback(async (userId: string): Promise<any> => {
+    try{
+      const response = await getChatHistories(userId);
+      return response;
+    }
+    catch{
+      throw new Error('Failed to getHistories');
+    }
+  }, []);
+
+  const sendMessage = useCallback(async (prompt: string, userId: string, sessionId: string) => {
     if (!prompt.trim() || state.isLoading) return;
 
     if (abortControllerRef.current) {
@@ -89,7 +118,7 @@ export const useChat = () => {
 
       const botMessageId = addMessage('', 'bot', true);
 
-      const response = await sendChatMessage(prompt, 'temp-user-id'); // Replace with actual user ID from auth
+      const response = await sendChatMessage(prompt, userId, sessionId); // Replace with actual user ID from auth
       const responseText = response.data.response;
 
       await simulateTyping(responseText, botMessageId);
@@ -123,6 +152,9 @@ export const useChat = () => {
   return {
     ...state,
     sendMessage,
+    startChat,
+    getHistory,
+    getHistories,
     stopGeneration,
   };
 };
